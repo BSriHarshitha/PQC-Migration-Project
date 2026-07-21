@@ -1,10 +1,12 @@
 # Java
 *.class
-*.jar
 *.war
 *.ear
 target/
 *.log
+
+# Allow lib jars (needed for build)
+!lib/*.jar
 
 # Maven
 .mvn/
