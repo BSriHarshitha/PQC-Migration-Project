@@ -1,0 +1,34 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+*.log
+
+# Maven
+.mvn/
+mvn.cmd
+mvnw
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.eclipse/
+*.swp
+
+# Keys & Secrets
+*.pem
+*.key
+keys/
+private_keys/
+
+# Results & Benchmarks
+results/
+*.csv
+benchmark_results/
+
+# OS
+.DS_Store
+Thumbs.db
