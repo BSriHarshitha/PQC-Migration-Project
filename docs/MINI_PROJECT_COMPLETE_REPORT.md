@@ -657,15 +657,32 @@ Tampered:     ✗ FALSE  ← tamper correctly detected
 
 **Hybrid Tab (RSA-2048 + Kyber-1024 + Dilithium-5)**
 ```
-Init (ms):         1126
-Key Exchange (ms):   19
-Encrypt (ms):        12
-Decrypt (ms):         0
-Sign (ms):           50
-Verify (ms):          8
-AES Key (B):         32
-Hybrid Valid:     ✓ TRUE
+Init (ms):         1126   ← RSA-2048 keygen (~417ms) + Kyber-1024 (~52ms) + Dilithium-5 (~60ms) + JVM overhead
+Key Exchange (ms):   19   ← SHA-256(rsaSecret ∥ kyberSecret) KEM combiner
+Encrypt (ms):        12   ← AES-256/ECB/PKCS5Padding encryption
+Decrypt (ms):         0   ← AES-256 decryption (sub-millisecond)
+Sign (ms):           50   ← SHA256withRSA + DilithiumSigner both sign
+Verify (ms):          8   ← Both RSA and Dilithium signatures verified
+AES Key (B):         32   ← 256-bit AES key from hybrid key exchange
+Hybrid Valid:     ✓ TRUE  ← Both RSA AND Dilithium verification passed
 ```
+
+**Factor Analysis (Hybrid vs RSA-only):**
+| Metric | RSA-only | Hybrid | Factor |
+|--------|----------|--------|--------|
+| Key Gen | ~417ms | ~1126ms | Hybrid slower (includes 3 keygens) |
+| Encrypt | ~166ms | ~12ms | Hybrid 14× FASTER (AES-256 vs RSA) |
+| Decrypt | ~5ms | ~0ms | Hybrid faster |
+| Sign | ~5ms | ~50ms | Hybrid slower (dual sig) |
+| Verify | ~3ms | ~8ms | Hybrid slightly slower |
+| Quantum-Safe | ✗ NO | ✓ YES | Hybrid wins |
+
+**Why Init is ~1126ms:**
+- RSA-2048 key generation: ~417ms
+- Kyber-1024 key generation: ~52ms
+- Dilithium-5 key generation: ~60ms
+- JVM overhead + initialization: ~597ms
+- Total: ~1126ms (one-time cost; subsequent operations are fast)
 
 **RSA Tab (RSA-2048)**
 ```
